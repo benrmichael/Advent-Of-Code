@@ -21,6 +21,7 @@ package io.github.brm.aoc;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
@@ -28,7 +29,8 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 /**
- * TODO: Class description
+ * Abstract class that can be extended by an advent of code
+ * class used to solve the puzzles for any given day.
  *
  * @author benjaminmichael
  * @since 0.0.0
@@ -43,34 +45,67 @@ public abstract class AdventOfCodePuzzle {
       this.day = day;
    }
 
+    /**
+     * Read the input file and map each line using the given
+     * mapper to the expected object type.
+     *
+     * @param mapper mapper to use
+     * @return stream of type {@code T}
+     * @param <T> the object type.
+     */
    protected <T> Stream<T> readInput(Function<String, T> mapper) {
-      return readInput().stream()
+      return readInput()
               .filter(Objects::nonNull)
               .filter(Predicate.not(String::isBlank))
               .map(mapper);
    }
 
-   protected List<String> readInput() {
+    /**
+     * Read the input file, split each line of the input file
+     * using the given {@code splitter}, then map each split
+     * string to the type {@code T} with the mapper.
+     *
+     * @param splitter splitter used to split each input line.
+     * @param mapper mapper to map to expected type.
+     * @return stream of {@code T}
+     * @param <T> the mapped object type
+     */
+    protected <T> Stream<T> readInput(String splitter, Function<String, T> mapper) {
+       return readInput()
+               .flatMap(line -> Arrays.stream(line.split(splitter)))
+               .map(mapper);
+    }
+
+    /**
+     * Read the input file for this day and return it as a
+     * stream of the lines contained.
+     *
+     * @return stream of lines in the input file.
+     */
+    protected Stream<String> readInput() {
       String inputFileName = String.format("/%d/day%d.txt", year, day);
       URL resource = AdventOfCodePuzzle.class.getResource(inputFileName);
       try {
          assert resource != null;
          Path path = Path.of(resource.toURI());
-         return Files.readAllLines(path);
+         return Files.lines(path);
       } catch (Exception exception) {
          throw new RuntimeException(exception);
       }
    }
 
-   public abstract Object solvePartOne();
+   /** Solve part one */
+   public abstract long solvePartOne();
 
-   public abstract Object solvePartTwo();
+   /** Solve part two */
+   public abstract long solvePartTwo();
 
+   /** Calls the methods to solve each puzzle and prints the answers */
    public void solvePuzzles() {
-      Object partOneSolution = solvePartOne();
-      Object partTwoSolution = solvePartTwo();
+      long partOneSolution = solvePartOne();
+      long partTwoSolution = solvePartTwo();
 
-      System.out.printf("Answer to day one = \"%s\"\n", partOneSolution);
-      System.out.printf("Answer to day two = \"%s\"\n", partTwoSolution);
+      System.out.printf("Answer to day one = \"%d\"\n", partOneSolution);
+      System.out.printf("Answer to day two = \"%d\"\n", partTwoSolution);
    }
 }

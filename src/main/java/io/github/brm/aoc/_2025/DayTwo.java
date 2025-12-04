@@ -20,7 +20,10 @@ package io.github.brm.aoc._2025;
 
 import io.github.brm.aoc.AdventOfCodePuzzle;
 
-import static java.lang.Integer.parseInt;
+import java.util.Objects;
+import java.util.stream.LongStream;
+import java.util.stream.Stream;
+
 import static java.lang.Long.parseLong;
 
 /**
@@ -31,42 +34,53 @@ import static java.lang.Long.parseLong;
  */
 public class DayTwo extends AdventOfCodePuzzle {
 
+    /** Range of IDs */
+    private record IdRange(long start, long end) {
+
+        /** Factory method */
+        public static IdRange from(String input) {
+            String[] range = input.split("-");
+            long start = parseLong(range[0]);
+            long end = parseLong(range[1]);
+            return new IdRange(start, end);
+        }
+
+        /** Stream over the ID range */
+        public Stream<String> stream() {
+            return LongStream.rangeClosed(start, end)
+                    .boxed()
+                    .map(Objects::toString);
+        }
+    }
+
     /** Day Two */
     public DayTwo() {
         super(2025, 2);
     }
 
     @Override
-    public Object solvePartOne() {
-        String line = readInput().get(0);
-        String[] ids = line.split(",");
-
-        long sum = 0;
-        for (String id : ids) {
-            String[] range = id.split("-");
-            long lower = parseLong(range[0]);
-            long upper = parseLong(range[1]);
-
-            for (long i = lower; i <= upper; i++) {
-                String idString = Long.toString(i);
-                if (isInvalidId(idString)) {
-                    sum += i;
-                }
-            }
-        }
-
-        return sum;
+    public long solvePartOne() {
+        return readInput(",", IdRange::from)
+                .flatMap(IdRange::stream)
+                .filter(id -> id.length() % 2 == 0)
+                .filter(id -> {
+                    int middle = id.length() / 2;
+                    return id.substring(0, middle).equals(id.substring(middle));
+                })
+                .mapToLong(Long::parseLong)
+                .sum();
     }
 
-    private boolean isInvalidId(String id) {
-        if (id.length() % 2 != 0) {
-            return false;
-        }
-
-        int middle = id.length() / 2;
-        return id.substring(0, middle).equals(id.substring(middle));
+    @Override
+    public long solvePartTwo() {
+        return readInput(",", IdRange::from)
+                .flatMap(IdRange::stream)
+                .filter(this::hasRepeatedSequence)
+                .mapToLong(Long::parseLong)
+                .sum();
     }
 
+    /** Check for part two */
     private boolean hasRepeatedSequence(String source) {
         for (int i = 1; i < source.length(); i++) {
             if (source.length() % i == 0) {
@@ -78,28 +92,6 @@ public class DayTwo extends AdventOfCodePuzzle {
         }
 
         return false;
-    }
-
-    @Override
-    public Object solvePartTwo() {
-        String line = readInput().get(0);
-        String[] ids = line.split(",");
-
-        long sum = 0;
-        for (String id : ids) {
-            String[] range = id.split("-");
-            long lower = parseLong(range[0]);
-            long upper = parseLong(range[1]);
-
-            for (long i = lower; i <= upper; i++) {
-                String idString = Long.toString(i);
-                if (hasRepeatedSequence(idString)) {
-                    sum += i;
-                }
-            }
-        }
-
-        return sum;
     }
 
     /** Solve day two */

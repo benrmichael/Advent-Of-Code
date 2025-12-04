@@ -37,15 +37,15 @@ public class DayThree extends AdventOfCodePuzzle {
     }
 
     @Override
-    public Object solvePartOne() {
-        return readInput().stream()
+    public long solvePartOne() {
+        return readInput()
                 .mapToLong(bank -> findLargestJoltage(bank, 2))
                 .sum();
     }
 
     @Override
-    public Object solvePartTwo() {
-        return readInput().stream()
+    public long solvePartTwo() {
+        return readInput()
                 .mapToLong(bank -> findLargestJoltage(bank, 12))
                 .sum();
     }

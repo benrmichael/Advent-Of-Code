@@ -58,7 +58,7 @@ public class DayOne extends AdventOfCodePuzzle {
     }
 
     @Override
-    public Object solvePartOne() {
+    public long solvePartOne() {
         return readInput(DayOne::mapLineToTurn).reduce(
                 new Dial(),
                 (dial, turn) -> {
@@ -73,7 +73,7 @@ public class DayOne extends AdventOfCodePuzzle {
     }
 
     @Override
-    public Object solvePartTwo() {
+    public long solvePartTwo() {
         return readInput(DayOne::mapLineToTurn).reduce(
                 new Dial(),
                 (dial, turn) -> {
