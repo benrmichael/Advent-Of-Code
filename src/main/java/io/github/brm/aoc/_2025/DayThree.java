@@ -28,6 +28,9 @@ import io.github.brm.aoc.AdventOfCodePuzzle;
  */
 public class DayThree extends AdventOfCodePuzzle {
 
+    /** A battery in the bank */
+    private record Battery(char jolts, int position) { }
+
     /** Day three */
     public DayThree() {
         super(2025, 3);
@@ -50,26 +53,27 @@ public class DayThree extends AdventOfCodePuzzle {
     private long findLargestJoltage(String bankString, int numBatteries) {
         int len = bankString.length();
         char[] bank = bankString.toCharArray();
-        char[] batteries = new char[numBatteries];
-        System.arraycopy(bank, 0, batteries, 0, numBatteries);
+        Battery[] batteries = new Battery[numBatteries];
 
         for (int i = 0; i < len; i++) {
-            char voltage = bank[i];
+            char jolts = bank[i];
             for (int j = 0; j < numBatteries; j++) {
                 if (i + (numBatteries - j - 1) >= len) {
                     continue;
                 }
 
-                if (voltage > batteries[j]) {
-                    System.arraycopy(bank, i, batteries, j, numBatteries - j);
+                if (batteries[j] == null || (jolts > batteries[j].jolts && i > batteries[j].position)) {
+                    for (int k = j, n = i; k < numBatteries; k++, n++) {
+                        batteries[k] = new Battery(bank[n], n);
+                    }
                     break;
                 }
             }
         }
 
         long totalJolatage = 0;
-        for (char battery : batteries) {
-            int jolts = battery - '0';
+        for (Battery battery : batteries) {
+            int jolts = battery.jolts - '0';
             totalJolatage = totalJolatage * 10 + jolts;
         }
 
