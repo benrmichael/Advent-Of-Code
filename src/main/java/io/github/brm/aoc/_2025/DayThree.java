@@ -35,12 +35,45 @@ public class DayThree extends AdventOfCodePuzzle {
 
     @Override
     public Object solvePartOne() {
-        return null;
+        return readInput().stream()
+                .mapToLong(bank -> findLargestJoltage(bank, 2))
+                .sum();
     }
 
     @Override
     public Object solvePartTwo() {
-        return null;
+        return readInput().stream()
+                .mapToLong(bank -> findLargestJoltage(bank, 12))
+                .sum();
+    }
+
+    private long findLargestJoltage(String bankString, int numBatteries) {
+        int len = bankString.length();
+        char[] bank = bankString.toCharArray();
+        char[] batteries = new char[numBatteries];
+        System.arraycopy(bank, 0, batteries, 0, numBatteries);
+
+        for (int i = 0; i < len; i++) {
+            char voltage = bank[i];
+            for (int j = 0; j < numBatteries; j++) {
+                if (i + (numBatteries - j - 1) >= len) {
+                    continue;
+                }
+
+                if (voltage > batteries[j]) {
+                    System.arraycopy(bank, i, batteries, j, numBatteries - j);
+                    break;
+                }
+            }
+        }
+
+        long totalJolatage = 0;
+        for (char battery : batteries) {
+            int jolts = battery - '0';
+            totalJolatage = totalJolatage * 10 + jolts;
+        }
+
+        return totalJolatage;
     }
 
     /** Solve day three */
