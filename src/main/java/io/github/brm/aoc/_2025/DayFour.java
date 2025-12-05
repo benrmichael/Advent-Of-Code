@@ -20,7 +20,11 @@ package io.github.brm.aoc._2025;
 
 import io.github.brm.aoc.AdventOfCodePuzzle;
 
+import java.util.ArrayDeque;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Queue;
+import java.util.Set;
 
 /**
  * Day 4: Printing Department
@@ -86,19 +90,38 @@ public class DayFour extends AdventOfCodePuzzle {
       int count = 0;
       char[][] map = readInput(String::toCharArray).toArray(char[][]::new);
 
-      while (true) {
-         int prev = count;
-         for (int row = 0; row < map.length; row++) {
-            for (int col = 0; col < map[row].length; col++) {
-               if (map[row][col] == '@' && canMovePaperRoll(map, row, col)) {
-                  map[row][col] = '.';
-                  count++;
-               }
+      Queue<Move> queue = new ArrayDeque<>();
+      Set<Move> inQueue = new HashSet<>();
+
+      for (int i = 0; i < map.length; i++) {
+         for (int j = 0; j < map[i].length; j++) {
+            if (map[i][j] == '@') {
+               Move move = new Move(i, j);
+               queue.add(move);
+               inQueue.add(move);
             }
          }
+      }
 
-         if (prev == count) {
-            break;
+      while (!queue.isEmpty()) {
+         Move pos = queue.poll();
+         inQueue.remove(pos);
+
+         int r = pos.r(), c = pos.c();
+         if (map[r][c] == '@' && canMovePaperRoll(map, r, c)) {
+            map[r][c] = '.';
+            count++;
+
+            for (Move move : moves) {
+               int newR = r + move.r();
+               int newC = c + move.c();
+               Move newMove = new Move(newR, newC);
+
+               if (!inQueue.contains(newMove) && inBounds(map, newR, newC) && map[newR][newC] == '@') {
+                  queue.offer(newMove);
+                  inQueue.add(newMove);
+               }
+            }
          }
       }
 
