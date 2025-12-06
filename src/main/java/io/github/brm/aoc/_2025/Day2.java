@@ -32,7 +32,7 @@ import static java.lang.Long.parseLong;
  * @author benjaminmichael
  * @since 12-3-25
  */
-public class DayTwo extends AdventOfCodePuzzle {
+public class Day2 extends AdventOfCodePuzzle {
 
     /** Range of IDs */
     private record IdRange(long start, long end) {
@@ -54,7 +54,7 @@ public class DayTwo extends AdventOfCodePuzzle {
     }
 
     /** Day Two */
-    public DayTwo() {
+    public Day2() {
         super(2025, 2);
     }
 
@@ -96,6 +96,6 @@ public class DayTwo extends AdventOfCodePuzzle {
 
     /** Solve day two */
     public static void main(String[] args) {
-        new DayTwo().solvePuzzles();
+        new Day2().solvePuzzles();
     }
 }

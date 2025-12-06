@@ -32,7 +32,7 @@ import java.util.Set;
  * @author benjaminmichael
  * @since 12-4-2025
  */
-public class DayFour extends AdventOfCodePuzzle {
+public class Day4 extends AdventOfCodePuzzle {
 
    /** A 2D move */
    private record Move(int r, int c) { }
@@ -42,7 +42,7 @@ public class DayFour extends AdventOfCodePuzzle {
            new Move(-1, -1), new Move(-1, 1), new Move(1, 1), new Move(1, -1));
 
    /** Day four */
-   public DayFour() {
+   public Day4() {
       super(2025, 4);
    }
 
@@ -130,6 +130,6 @@ public class DayFour extends AdventOfCodePuzzle {
 
    /** Solve day fours puzzles */
    public static void main(String[] args) {
-      new DayFour().solvePuzzles();
+      new Day4().solvePuzzles();
    }
 }

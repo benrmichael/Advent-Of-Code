@@ -26,13 +26,13 @@ import io.github.brm.aoc.AdventOfCodePuzzle;
  * @author benjaminmichael
  * @since 12-3-25
  */
-public class DayThree extends AdventOfCodePuzzle {
+public class Day3 extends AdventOfCodePuzzle {
 
     /** A battery in the bank */
     private record Battery(char jolts, int position) { }
 
     /** Day three */
-    public DayThree() {
+    public Day3() {
         super(2025, 3);
     }
 
@@ -82,6 +82,6 @@ public class DayThree extends AdventOfCodePuzzle {
 
     /** Solve day three */
     public static void main(String[] args) {
-        new DayThree().solvePuzzles();
+        new Day3().solvePuzzles();
     }
 }
