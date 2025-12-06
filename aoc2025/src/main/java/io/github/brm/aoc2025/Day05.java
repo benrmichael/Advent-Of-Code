@@ -40,13 +40,13 @@ import static java.lang.Long.parseLong;
  * @author Copyright 2025 Chesapeake Technology International Corp.
  * @since 12-5-25
  */
-public class Day5 extends AdventOfCodePuzzle {
+public class Day05 extends AdventOfCodePuzzle {
 
     private final List<long[]> freshRanges;
     private final List<Long> ingredients = new ArrayList<>();
 
     /** Day five */
-    public Day5() {
+    public Day05() {
         List<long[]> ranges = new ArrayList<>();
         Iterator<String> iter = readInput().iterator();
         while (iter.hasNext()) {
@@ -123,6 +123,6 @@ public class Day5 extends AdventOfCodePuzzle {
 
     /** Solve day five */
     public static void main(String[] args) {
-        new Day5().solvePuzzles();
+        new Day05().solvePuzzles();
     }
 }

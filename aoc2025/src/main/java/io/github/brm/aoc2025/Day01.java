@@ -27,7 +27,7 @@ import static java.lang.Integer.parseInt;
  * @author benjaminmichael
  * @since 12-3-25
  */
-public class Day1 extends AdventOfCodePuzzle {
+public class Day01 extends AdventOfCodePuzzle {
     private static final int DIAL_SIZE = 100;
 
     /** The dial, starts at 50 */
@@ -53,7 +53,7 @@ public class Day1 extends AdventOfCodePuzzle {
 
     @Override
     public long solvePartOne() {
-        return readInput(Day1::mapLineToTurn).reduce(
+        return readInput(Day01::mapLineToTurn).reduce(
                 new Dial(),
                 (dial, turn) -> {
                     dial.value = Math.floorMod(dial.value + turn, DIAL_SIZE);
@@ -68,7 +68,7 @@ public class Day1 extends AdventOfCodePuzzle {
 
     @Override
     public long solvePartTwo() {
-        return readInput(Day1::mapLineToTurn).reduce(
+        return readInput(Day01::mapLineToTurn).reduce(
                 new Dial(),
                 (dial, turn) -> {
                     dial.hits += (Math.abs(turn) / 100);
@@ -87,6 +87,6 @@ public class Day1 extends AdventOfCodePuzzle {
 
     /** Solve day one */
     public static void main(String[] args) {
-        new Day1().solvePuzzles();
+        new Day01().solvePuzzles();
     }
 }

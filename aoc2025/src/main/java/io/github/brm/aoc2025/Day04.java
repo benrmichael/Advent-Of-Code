@@ -30,7 +30,7 @@ import java.util.Set;
  * @author benjaminmichael
  * @since 12-4-2025
  */
-public class Day4 extends AdventOfCodePuzzle {
+public class Day04 extends AdventOfCodePuzzle {
 
    /** A 2D move */
    private record Move(int r, int c) { }
@@ -123,6 +123,6 @@ public class Day4 extends AdventOfCodePuzzle {
 
    /** Solve day fours puzzles */
    public static void main(String[] args) {
-      new Day4().solvePuzzles();
+      new Day04().solvePuzzles();
    }
 }

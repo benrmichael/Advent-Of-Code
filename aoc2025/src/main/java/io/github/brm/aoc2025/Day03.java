@@ -24,7 +24,7 @@ package io.github.brm.aoc2025;
  * @author benjaminmichael
  * @since 12-3-25
  */
-public class Day3 extends AdventOfCodePuzzle {
+public class Day03 extends AdventOfCodePuzzle {
 
     /** A battery in the bank */
     private record Battery(char jolts, int position) { }
@@ -75,6 +75,6 @@ public class Day3 extends AdventOfCodePuzzle {
 
     /** Solve day three */
     public static void main(String[] args) {
-        new Day3().solvePuzzles();
+        new Day03().solvePuzzles();
     }
 }

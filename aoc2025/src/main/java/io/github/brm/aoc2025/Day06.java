@@ -31,7 +31,7 @@ import java.util.Map;
  * @author benjaminmichael
  * @since 12-6-25
  */
-public class Day6 extends AdventOfCodePuzzle {
+public class Day06 extends AdventOfCodePuzzle {
 
     /** Line of numbers from input */
     private final List<String> numberLines;
@@ -39,7 +39,7 @@ public class Day6 extends AdventOfCodePuzzle {
     private final List<Operation> operations;
 
     /** Day 6 */
-    public Day6() {
+    public Day06() {
         List<String> numberLines = new ArrayList<>();
         List<Operation> operations = new ArrayList<>();
         Iterator<String> iter = readInput().iterator();
@@ -116,7 +116,7 @@ public class Day6 extends AdventOfCodePuzzle {
 
     /** Solve day six */
     public static void main(String[] args) {
-        new Day6().solvePuzzles();
+        new Day06().solvePuzzles();
     }
 
     /** Math operation */

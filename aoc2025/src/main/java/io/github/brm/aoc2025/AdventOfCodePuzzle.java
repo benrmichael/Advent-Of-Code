@@ -40,7 +40,7 @@ public abstract class AdventOfCodePuzzle {
 
    protected AdventOfCodePuzzle() {
        String name = getClass().getSimpleName();
-       this.day = name.charAt(name.length() - 1) - '0';
+       this.day = Integer.parseInt(name.substring(3));
    }
 
     /**
