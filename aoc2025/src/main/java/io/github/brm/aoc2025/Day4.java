@@ -16,9 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package io.github.brm.aoc._2025;
-
-import io.github.brm.aoc.AdventOfCodePuzzle;
+package io.github.brm.aoc2025;
 
 import java.util.ArrayDeque;
 import java.util.HashSet;
@@ -40,11 +38,6 @@ public class Day4 extends AdventOfCodePuzzle {
    private static final List<Move> moves = List.of(
            new Move(1, 0), new Move(-1, 0), new Move(0, 1), new Move(0, -1),
            new Move(-1, -1), new Move(-1, 1), new Move(1, 1), new Move(1, -1));
-
-   /** Day four */
-   public Day4() {
-      super(2025, 4);
-   }
 
    @Override
    public long solvePartOne() {

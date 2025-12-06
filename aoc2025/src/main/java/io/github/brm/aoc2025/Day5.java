@@ -25,9 +25,7 @@
 //  technical data, computer software, or portions thereof marked with
 //  this legend must also reproduce the markings.
 //========================================================================
-package io.github.brm.aoc._2025;
-
-import io.github.brm.aoc.AdventOfCodePuzzle;
+package io.github.brm.aoc2025;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -49,8 +47,6 @@ public class Day5 extends AdventOfCodePuzzle {
 
     /** Day five */
     public Day5() {
-        super(2025, 5);
-
         List<long[]> ranges = new ArrayList<>();
         Iterator<String> iter = readInput().iterator();
         while (iter.hasNext()) {

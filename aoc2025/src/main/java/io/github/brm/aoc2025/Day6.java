@@ -16,10 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package io.github.brm.aoc._2025;
-
-import io.github.brm.aoc.AdventOfCodePuzzle;
-import org.w3c.dom.css.Counter;
+package io.github.brm.aoc2025;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -43,8 +40,6 @@ public class Day6 extends AdventOfCodePuzzle {
 
     /** Day 6 */
     public Day6() {
-        super(2025, 6);
-
         List<String> numberLines = new ArrayList<>();
         List<Operation> operations = new ArrayList<>();
         Iterator<String> iter = readInput().iterator();

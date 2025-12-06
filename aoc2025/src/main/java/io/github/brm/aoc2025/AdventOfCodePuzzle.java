@@ -16,13 +16,12 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package io.github.brm.aoc;
+package io.github.brm.aoc2025;
 
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -37,12 +36,11 @@ import java.util.stream.Stream;
  */
 public abstract class AdventOfCodePuzzle {
 
-   private final int year;
    private final int day;
 
-   protected AdventOfCodePuzzle(int year, int day) {
-      this.year = year;
-      this.day = day;
+   protected AdventOfCodePuzzle() {
+       String name = getClass().getSimpleName();
+       this.day = name.charAt(name.length() - 1) - '0';
    }
 
     /**
@@ -83,7 +81,7 @@ public abstract class AdventOfCodePuzzle {
      * @return stream of lines in the input file.
      */
     protected Stream<String> readInput() {
-      String inputFileName = String.format("/%d/day%d.txt", year, day);
+      String inputFileName = String.format("/day%d.txt", day);
       URL resource = AdventOfCodePuzzle.class.getResource(inputFileName);
       try {
          assert resource != null;

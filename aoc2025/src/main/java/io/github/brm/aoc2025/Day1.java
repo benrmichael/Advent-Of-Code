@@ -16,9 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package io.github.brm.aoc._2025;
-
-import io.github.brm.aoc.AdventOfCodePuzzle;
+package io.github.brm.aoc2025;
 
 
 import static java.lang.Integer.parseInt;
@@ -45,10 +43,6 @@ public class Day1 extends AdventOfCodePuzzle {
         public int hits() {
             return hits;
         }
-    }
-
-    public Day1() {
-        super(2025, 1);
     }
 
     private static int mapLineToTurn(String line) {

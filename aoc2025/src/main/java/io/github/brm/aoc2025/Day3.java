@@ -16,9 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package io.github.brm.aoc._2025;
-
-import io.github.brm.aoc.AdventOfCodePuzzle;
+package io.github.brm.aoc2025;
 
 /**
  * Day 3: Lobby
@@ -30,11 +28,6 @@ public class Day3 extends AdventOfCodePuzzle {
 
     /** A battery in the bank */
     private record Battery(char jolts, int position) { }
-
-    /** Day three */
-    public Day3() {
-        super(2025, 3);
-    }
 
     @Override
     public long solvePartOne() {

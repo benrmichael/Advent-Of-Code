@@ -16,9 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package io.github.brm.aoc._2025;
-
-import io.github.brm.aoc.AdventOfCodePuzzle;
+package io.github.brm.aoc2025;
 
 import java.util.Objects;
 import java.util.stream.LongStream;
@@ -51,11 +49,6 @@ public class Day2 extends AdventOfCodePuzzle {
                     .boxed()
                     .map(Objects::toString);
         }
-    }
-
-    /** Day Two */
-    public Day2() {
-        super(2025, 2);
     }
 
     @Override
