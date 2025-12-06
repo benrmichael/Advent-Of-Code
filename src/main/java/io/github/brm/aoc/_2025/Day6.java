@@ -19,6 +19,7 @@
 package io.github.brm.aoc._2025;
 
 import io.github.brm.aoc.AdventOfCodePuzzle;
+import org.w3c.dom.css.Counter;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -64,11 +65,24 @@ public class Day6 extends AdventOfCodePuzzle {
 
     @Override
     public long solvePartOne() {
-        return numberLines.stream()
+        // Identities for each problem
+        long[] identities = operations.stream()
+                .mapToLong(Operation::identity)
+                .toArray();
+
+        long[] results = numberLines.stream()
                 .map(line -> line.split("\\s+"))
                 .map(arr -> Arrays.stream(arr).mapToLong(Long::parseLong).toArray())
-                .reduce(new Counter(operations), Counter::addAll, Counter::merge)
-                .sum();
+                .reduce(
+                        identities,
+                        (acc, nums) -> {
+                            for (int i = 0; i < nums.length; i++) {
+                                acc[i] = operations.get(i).apply(acc[i], nums[i]);
+                            }
+                            return acc;
+                        });
+
+        return Arrays.stream(results).sum();
     }
 
     @Override
@@ -108,39 +122,6 @@ public class Day6 extends AdventOfCodePuzzle {
     /** Solve day six */
     public static void main(String[] args) {
         new Day6().solvePuzzles();
-    }
-
-    private static class Counter {
-        public long[] values;
-        private final List<Operation> operations;
-
-        /** New state for the provided operations */
-        public Counter(List<Operation> operations) {
-            this.operations = operations;
-            values = new long[operations.size()];
-            for (int i = 0; i < operations.size(); i++) {
-                values[i] = operations.get(i).identity();
-            }
-        }
-
-        /** Add all the numbers to the counter */
-        public Counter addAll(long[] numbers) {
-            for (int i = 0; i < numbers.length && i < values.length && i < operations.size(); i++) {
-                values[i] = operations.get(i).apply(values[i], numbers[i]);
-            }
-
-            return this;
-        }
-
-        /** For binary operator */
-        public Counter merge(Counter other) {
-            return this;
-        }
-
-        /** Sum the value array */
-        public long sum() {
-            return Arrays.stream(values).sum();
-        }
     }
 
     /** Math operation */
