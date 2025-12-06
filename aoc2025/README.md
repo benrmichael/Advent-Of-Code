@@ -1,2 +1,2 @@
-# Advent-Of-Code
-Collection of solutions to advent of code puzzles broken down by year.
+# Advent of Code - 2025 🎄
+This years puzzles are done in Java
