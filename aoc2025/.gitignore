@@ -41,4 +41,4 @@ bin/
 ### Mac OS ###
 .DS_Store
 .idea
-/src/main/resources/2025/
+/src/main/resources/
