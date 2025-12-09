@@ -58,6 +58,12 @@ public abstract class AdventOfCodePuzzle {
               .map(mapper);
    }
 
+   protected Stream<String[]> readInput(String splitter) {
+       return readInput()
+               .filter(Objects::nonNull)
+               .map(s -> s.split(splitter));
+   }
+
     /**
      * Read the input file, split each line of the input file
      * using the given {@code splitter}, then map each split
