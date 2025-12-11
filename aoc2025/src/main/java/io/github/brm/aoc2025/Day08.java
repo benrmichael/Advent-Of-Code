@@ -27,15 +27,7 @@
 //========================================================================
 package io.github.brm.aoc2025;
 
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.PriorityQueue;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
+import java.util.*;
 
 import static java.lang.Integer.parseInt;
 
@@ -47,156 +39,185 @@ import static java.lang.Integer.parseInt;
  */
 public class Day08 extends AdventOfCodePuzzle {
 
-    /** All the junction boxes */
-    private final List<Node> junctionBoxes;
+    private final List<JunctionBox> junctionBoxes;
+    private final List<Connection> pairs;
 
-    /** Set up the input */
+    /** Max connections to make for part one */
+    private static final int P1_MAX = 1000;
+
     public Day08() {
         this.junctionBoxes = readInput(",")
-                .map(arr -> new Node(parseInt(arr[0]), parseInt(arr[1]), parseInt(arr[2])))
+                .map(JunctionBox::fromLine)
                 .toList();
+
+        // Precompute all pair distances and sort
+        int n = junctionBoxes.size();
+        this.pairs = new ArrayList<>(n * n);
+
+        for (int i = 0; i < n; i++) {
+            JunctionBox a = junctionBoxes.get(i);
+            for (int j = i + 1; j < n; j++) {
+                JunctionBox b = junctionBoxes.get(j);
+                double dist = a.distanceFrom(b);
+                pairs.add(new Connection(i, j, dist));
+            }
+        }
+
+        Collections.sort(pairs);
     }
 
     @Override
     public long solvePartOne() {
-        int maxConnections = 1000;
-        PriorityQueue<Connection> pq = new PriorityQueue<>(maxConnections, Collections.reverseOrder());
-        for (int i = 0; i < junctionBoxes.size(); i++) {
-            Node first = junctionBoxes.get(i);
-            for (int j = i + 1; j < junctionBoxes.size(); j++) {
-                Node second = junctionBoxes.get(j);
-                Connection connection = new Connection(first, second);
-                if (pq.size() < maxConnections) {
-                    pq.offer(connection);
-                    first.addConnection(second);
-                } else if (pq.peek().distance() > connection.distance()) {
-                    Connection old = pq.poll();
-                    old.one().removeConnection(old.two());
-                    pq.offer(connection);
-                    first.addConnection(second);
-                }
-            }
+        int n = junctionBoxes.size();
+        DisjointSetUnion dsu = new DisjointSetUnion(n);
+
+        for (int i = 0; i < Math.min(P1_MAX, pairs.size()); i++) {
+            Connection p = pairs.get(i);
+            dsu.union(p.i(), p.j());
         }
 
-        Set<Node> seenNodes = new HashSet<>();
-        SortedSet<Node> circuits = new TreeSet<>(Comparator.comparingInt(Node::connections).reversed());
-        for (Connection connection : pq) {
-            Node firstNode = connection.one();
-            if (!seenNodes.contains(firstNode)) {
-                circuits.add(firstNode);
-                seenNodes.addAll(firstNode.getNodesInCircuit());
-            }
+        Map<Integer, Integer> circuitSizes = new HashMap<>();
+        for (int i = 0; i < n; i++) {
+            int root = dsu.find(i);
+            circuitSizes.put(root, dsu.size(root));
         }
 
-        return circuits.stream()
+        return circuitSizes.values().stream()
+                .sorted(Comparator.reverseOrder())
                 .limit(3)
-                .mapToInt(Node::connections)
-                .reduce(1, (acc, i) -> acc * i);
+                .mapToLong(i -> i)
+                .reduce(1, (a, b) -> a * b);
     }
 
     @Override
     public long solvePartTwo() {
-        return 0;
+        int n = junctionBoxes.size();
+        DisjointSetUnion dsu = new DisjointSetUnion(n);
+
+        Connection last = null;
+        for (int idx = P1_MAX; idx < pairs.size(); idx++) {
+            Connection p = pairs.get(idx);
+
+            // Check if they are not already connected
+            if (dsu.union(p.i(), p.j())) {
+                last = p;
+
+                // Check if all nodes connected
+                if (dsu.size(0) == n) {
+                    break;
+                }
+            }
+        }
+
+        // Something went wrong if this fails...
+        assert last != null;
+
+        JunctionBox a = junctionBoxes.get(last.i());
+        JunctionBox b = junctionBoxes.get(last.j());
+        return (long) a.x * b.x;
     }
 
-    /** Solver for day 8 */
+    /** Solve day 8 */
     public static void main(String[] args) {
         new Day08().solvePuzzles();
     }
 
-    private static class Node {
-        public int x;
-        public int y;
-        public int z;
-        public final Set<Node> connections = new HashSet<>();
+    /** Simple junction box record */
+    private record JunctionBox(int x, int y, int z) {
 
-        public Node(int x, int y, int z) {
-            this.x = x;
-            this.y = y;
-            this.z = z;
+        /**
+         * Find the straight line distance from this box
+         * to the other box.
+         *
+         * @param o the other box.
+         * @return straight line distance.
+         */
+        public double distanceFrom(JunctionBox o) {
+            long dx = o.x - x;
+            long dy = o.y - y;
+            long dz = o.z - z;
+            return Math.sqrt(dx * dx + dy * dy + dz * dz);
         }
 
-        public int connections() {
-            return findEdges(new HashSet<>()).size() + 1;
-        }
-
-        public void addConnection(Node node) {
-            connections.add(node);
-            node.connections.add(this);
-        }
-
-        public void removeConnection(Node node) {
-            connections.remove(node);
-            node.connections.remove(this);
-        }
-
-        public Set<Node> getNodesInCircuit() {
-            return findEdges(new HashSet<>());
-        }
-
-        private Set<Node> findEdges(Set<Node> visited) {
-            if (visited.contains(this)) {
-                return Collections.emptySet();
-            }
-
-            visited.add(this);
-            Set<Node> edges = new HashSet<>();
-            for (Node node : connections) {
-                if (!visited.contains(node)) {
-                    edges.add(node);
-                    edges.addAll(node.findEdges(visited));
-                }
-            }
-
-            return edges;
-        }
-
-        public double distanceFrom(Node other) {
-            long _x = other.x - this.x;
-            long _y = other.y - this.y;
-            long _z = other.z - this.z;
-            return Math.sqrt(_x * _x + _y * _y + _z * _z);
-        }
-
-        @Override
-        public String toString() {
-            return "Node[x=" +  x
-                    + ", y=" + y
-                    + ", z=" + z + "]";
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(x, y, z);
-        }
-
-        @Override
-        public boolean equals(Object other) {
-            if (this == other) {
-                return true;
-            }
-
-            return other instanceof Node node
-                    && this.hashCode() == node.hashCode()
-                    && Objects.equals(this.x, node.x)
-                    && Objects.equals(this.y, node.y)
-                    && Objects.equals(this.z, node.z);
+        /**
+         * Util method to map an input line to a new junction
+         * box record.
+         *
+         * @param line the line to parse.
+         * @return a new junction box.
+         */
+        public static JunctionBox fromLine(String[] line) {
+            return new JunctionBox(parseInt(line[0]), parseInt(line[1]), parseInt(line[2]));
         }
     }
 
-    private record Connection(
-            Node one,
-            Node two,
-            double distance
-    ) implements Comparable<Connection> {
-
-        public Connection(Node one, Node two) {
-            this(one, two, one.distanceFrom(two));
-        }
-
+    /**
+     * A hypothetical connection between two junction boxes.
+     *
+     * @param i the index of the first junction box in the
+     *          {@link #junctionBoxes} list.
+     * @param j the index of the second junction box in
+     *          the {@link #junctionBoxes} list.
+     * @param distance distance between the two boxes.
+     */
+    private record Connection(int i, int j, double distance) implements Comparable<Connection> {
         @Override
         public int compareTo(Connection o) {
-            return Double.compare(this.distance, o.distance());
+            return Double.compare(distance, o.distance);
+        }
+    }
+
+    /**
+     * Disjoin union set used to efficiently merge disjoint
+     * circuits of junction boxes to avoid a costly traversal
+     * when checking connections.
+     *
+     * <p> To be transparent, my original solution to this
+     * problem was not so efficient so I looked up how to
+     * deal with having disjoint sets and ran into this article
+     * <a href="https://www.geeksforgeeks.org/dsa/introduction-to-disjoint-set-data-structure-or-union-find-algorithm/">which is what this class is based on</a>
+     */
+    private static class DisjointSetUnion {
+        private final int[] parent;
+        private final int[] size;
+
+        public DisjointSetUnion(int n) {
+            parent = new int[n];
+            size = new int[n];
+            for (int i = 0; i < n; i++) {
+                parent[i] = i;
+                size[i] = 1;
+            }
+        }
+
+        public int find(int x) {
+            if (parent[x] != x) {
+                parent[x] = find(parent[x]);
+            }
+
+            return parent[x];
+        }
+
+        public boolean union(int a, int b) {
+            int pa = find(a);
+            int pb = find(b);
+            if (pa == pb) {
+                return false;
+            }
+
+            if (size[pa] < size[pb]) {
+                int t = pa;
+                pa = pb;
+                pb = t;
+            }
+
+            parent[pb] = pa;
+            size[pa] += size[pb];
+            return true;
+        }
+
+        public int size(int x) {
+            return size[find(x)];
         }
     }
 }
