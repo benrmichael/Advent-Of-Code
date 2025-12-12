@@ -18,33 +18,18 @@
  */
 package io.github.brm.aoc2025.cmn;
 
-import java.util.Comparator;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- * Two directional point tuple
+ * Annotation that can be applied to methods in order to cache
+ * calls to the method and avoid doing duplicate work.
  *
  * @author benjaminmichael
- * @since 12-7-25
+ * @since 0.0.0
  */
-public record Point2D(int x, int y) implements Comparable<Point2D> {
-
-    /**
-     * Return a transform of this point, adding the given
-     * values for {@code x} and {@code y} to the point's
-     * current value.
-     *
-     * @param x the x transform.
-     * @param y the y transform.
-     * @return the transformed point.
-     */
-    public Point2D transform(int x, int y) {
-        return new Point2D(x() + x, y() + y);
-    }
-
-    @Override
-    public int compareTo(Point2D o) {
-        return Comparator.comparingInt(Point2D::x)
-                .thenComparingInt(Point2D::y)
-                .compare(this, o);
-    }
-}
+@Target(ElementType.METHOD)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface Cache { }
