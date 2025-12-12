@@ -18,12 +18,9 @@
  */
 package io.github.brm.aoc2025;
 
-import io.github.brm.aoc2025.cmn.Cache;
-
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -36,6 +33,7 @@ import java.util.Set;
 public class Day11 extends AdventOfCodePuzzle {
 
     private final Map<String, Set<String>> devices = new HashMap<>();
+    private final Map<String, Map<String, Long>> memo = new HashMap<>();
 
     /** Set up the input */
     public Day11() {
@@ -54,64 +52,56 @@ public class Day11 extends AdventOfCodePuzzle {
 
     @Override
     public long solvePartOne() {
-        return pathsOut(new HashSet<>(), "you");
+        return pathsBetween(new HashSet<>(), "you", "out");
     }
 
     /**
      * DFS search for a device to see how many paths from the
-     * device lead to the "out" device.
+     * current device lead to the "last" device.
      *
      * @param visited the devices visited thus far.
-     * @param device the device to visit.
-     * @return paths from the device to visit to "out".
+     * @param current the device to visit.
+     * @param last the last device to find.
+     * @return paths from the device to visit to the last.
      */
-    @Cache
-    private long pathsOut(Set<String> visited, String device) {
-        if (visited.contains(device) || !devices.containsKey(device)) {
+    private long pathsBetween(Set<String> visited, String current, String last) {
+        if (visited.contains(current) || !devices.containsKey(current)) {
             return 0L;
         }
 
-        visited.add(device);
+        // Check the memo
+        if (memo.containsKey(current) && memo.get(current).containsKey(last)) {
+            return memo.get(current).get(last);
+        }
+
+        visited.add(current);
         long paths = 0;
-        for (String d : devices.get(device)) {
-            if (d.equals("out")) {
+        for (String device : devices.get(current)) {
+            if (device.equals(last)) {
                 paths++;
             } else {
-                paths += pathsOut(visited, d);
+                paths += pathsBetween(visited, device, last);
             }
         }
-        visited.remove(device);
+        visited.remove(current);
+        memo.computeIfAbsent(current, key -> new HashMap<>()).put(last, paths);
 
         return paths;
     }
 
     @Override
     public long solvePartTwo() {
-        return pathsOut2(new HashSet<>(), "svr", new LinkedHashSet<>());
-    }
+        long svrToFft = pathsBetween(new HashSet<>(), "svr", "fft");
+        long fftToDac = pathsBetween(new HashSet<>(), "fft", "dac");
+        long dacToOut = pathsBetween(new HashSet<>(), "dac", "out");
+        long branchOne = svrToFft * fftToDac * dacToOut;
 
-    private long pathsOut2(Set<String> visited, String device, Set<String> path) {
-        // Avoid loop
-        if (visited.contains(device)) {
-            return 0L;
-        }
+        long svrToDac = pathsBetween(new HashSet<>(), "svr", "dac");
+        long dacToFft = pathsBetween(new HashSet<>(), "dac", "fft");
+        long fftToOut = pathsBetween(new HashSet<>(), "fft", "out");
+        long branchTwo = svrToDac * dacToFft * fftToOut;
 
-        path.add(device);
-        visited.add(device);
-        long paths = 0;
-        for (String d : devices.get(device)) {
-            if (d.equals("out")) {
-                if (path.contains("fft") && path.contains("dac")) {
-                    paths++;
-                }
-            } else {
-                paths += pathsOut2(visited, d, path);
-            }
-        }
-        path.remove(device);
-        visited.remove(device);
-
-        return paths;
+        return branchOne + branchTwo;
     }
 
     /** Solve day 11 */
