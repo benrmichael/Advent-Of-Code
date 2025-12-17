@@ -18,11 +18,15 @@
  */
 package io.github.brm.aoc2025;
 
+import java.awt.Dimension;
+import java.awt.Point;
+import java.awt.Polygon;
+import java.awt.Rectangle;
+import java.util.Comparator;
 import java.util.List;
 import java.util.TreeSet;
 
 import static java.lang.Integer.parseInt;
-import static java.util.Collections.reverseOrder;
 
 /**
  * Day 9: Movie Theater
@@ -32,38 +36,50 @@ import static java.util.Collections.reverseOrder;
  */
 public class Day09 extends AdventOfCodePuzzle {
 
-    /** The red tile locations. arr[0] = x, arr[1] = y */
-    private final List<int[]> redTiles;
+    /** Bounding box formed by all points */
+    private final Polygon bounds = new Polygon();
     /** Areas of each square */
-    private final TreeSet<Square> areas = new TreeSet<>(reverseOrder());
+    private final TreeSet<Rectangle> rects = new TreeSet<>(Comparator.comparingLong(Day09::area)
+            .reversed()
+            .thenComparingInt(r -> r.x)
+            .thenComparingInt(r -> r.y)
+            .thenComparingInt(r -> r.width)
+            .thenComparingInt(r -> r.height));
 
     /** Read input */
     public Day09() {
-        redTiles = readInput(Day09::parseLine).toList();
+        List<int[]> redTiles = readInput(Day09::parseLine).toList();
         for (int i = 0; i < redTiles.size(); i++) {
             int[] a = redTiles.get(i);
+            bounds.addPoint(a[0], a[1]);
             for (int j = i + 1; j < redTiles.size(); j++) {
                 int[] b = redTiles.get(j);
-                areas.add(new Square(a, b, area(a, b)));
+                Point topLeft = new Point(Math.min(a[0], b[0]), Math.min(a[1], b[1]));
+                int width =  Math.abs(a[0] - b[0]);
+                int height = Math.abs(a[1] - b[1]);
+                Rectangle rect = new Rectangle(topLeft, new Dimension(width, height));
+                rects.add(rect);
             }
         }
     }
 
     @Override
     public long solvePartOne() {
-        return areas.first().area();
+        return area(rects.first());
     }
 
     @Override
     public long solvePartTwo() {
-        return -1L;
+        return rects.stream()
+                .filter(bounds::contains)
+                .findFirst()
+                .map(Day09::area)
+                .orElse(-1L);
     }
 
     /** Area formed by tiles in these two locations */
-    private static long area(int[] a, int[] b) {
-        long x = Math.abs(a[0] - b[0]) + 1;
-        long y = Math.abs(a[1] - b[1]) + 1;
-        return x * y;
+    private static long area(Rectangle rect) {
+        return (long) (rect.width + 1) * (rect.height + 1);
     }
 
     /** Parse input line into int[] */
@@ -78,13 +94,5 @@ public class Day09 extends AdventOfCodePuzzle {
     /** Solve day 9 puzzles */
     public static void main(String[] args) {
         new Day09().solvePuzzles();
-    }
-
-    /** Square! */
-    private record Square(int[] a, int[] b, long area) implements Comparable<Square> {
-        @Override
-        public int compareTo(Square other) {
-            return Long.compare(area(), other.area());
-        }
     }
 }
