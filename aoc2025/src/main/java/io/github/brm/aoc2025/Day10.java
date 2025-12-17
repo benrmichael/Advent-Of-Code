@@ -18,12 +18,8 @@
  */
 package io.github.brm.aoc2025;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static java.lang.Integer.MAX_VALUE;
 import static java.lang.Integer.parseInt;
@@ -46,12 +42,16 @@ public class Day10 extends AdventOfCodePuzzle {
 
     @Override
     public long solvePartOne() {
-        return machines.stream()
+        long start = System.currentTimeMillis();
+        long sum = machines.stream()
                 .mapToInt(machine -> {
                     boolean[] diagram = new boolean[machine.lightDiagram().size()];
-                    return solvePartOne2(machine, 0, 0, diagram);
+                    return solvePartOne2(machine, 0, 0, MAX_VALUE, diagram);
                 })
                 .sum();
+
+        System.out.printf("Time spent processing (%d ms)\n", System.currentTimeMillis() - start);
+        return sum;
     }
 
     /**
@@ -66,15 +66,20 @@ public class Day10 extends AdventOfCodePuzzle {
      * @return the number of button presses applicable, or the
      * constant {@link Integer#MAX_VALUE} if it cannot be done.
      */
-    private int solvePartOne2(Machine machine, int i, int n, boolean[] lightDiagram) {
+    private int solvePartOne2(Machine machine, int i, int n, int min, boolean[] lightDiagram) {
         if (i >= machine.schematics().size()) {
             return machine.isValidLightDiagram(lightDiagram) ? n : MAX_VALUE;
+        } else if (machine.isValidLightDiagram(lightDiagram)) {
+            return n;
+        } else if (n > min) {
+            return MAX_VALUE;
+        } else {
+            List<Integer> buttonToPress = machine.schematics().get(i++);
+            int zero = solvePartOne2(machine, i, n, min, lightDiagram);
+            min = Math.min(zero, min);
+            int once = solvePartOne2(machine, i, ++n, min, updateLightDiagram(buttonToPress, lightDiagram));
+            return min(zero, once);
         }
-
-        List<Integer> buttonToPress = machine.schematics().get(i++);
-        int zero = solvePartOne2(machine, i, n, lightDiagram);
-        int once = solvePartOne2(machine, i, ++n, updateLightDiagram(buttonToPress, lightDiagram));
-        return min(zero, once);
     }
 
     /** Clones the light diagram and presses the given button */
@@ -88,38 +93,41 @@ public class Day10 extends AdventOfCodePuzzle {
 
     @Override
     public long solvePartTwo() {
-        long sum = 0;
-        for (Machine machine : machines) {
-            int[] power = new int[machine.power().size()];
-            int needed = solvePartTwo2(machine, 0, 0, power, new HashMap<>());
-            sum += needed;
-        }
-
-        return sum;
+        AtomicInteger count = new AtomicInteger(0);
+        return machines.parallelStream()
+                .mapToInt(machine -> {
+                    int[] power = new int[machine.power.size()];
+                    int result = solvePartTwo2(machine, 0, 0, power, MAX_VALUE);
+                    int machineNumber = count.getAndIncrement();
+                    System.out.printf("Finished %d machine, %d left\n", machineNumber, machines.size() - machineNumber);
+                    return result;
+                })
+                .sum();
     }
 
-    private int solvePartTwo2(Machine machine, int i, int n, int[] power, Map<Integer, Integer> memo) {
+    private int solvePartTwo2(Machine machine, int i, int n, int[] power, int min) {
         if (i >= machine.schematics().size()) {
             return machine.isValidPowerLevels(power) ? n : MAX_VALUE;
         }
 
-        int hash = Objects.hash(i, Arrays.hashCode(power));
-        if (memo.containsKey(hash)) {
-            int val = memo.get(hash);
-            return (val == MAX_VALUE) ? val : val + n;
+        if (n > min) {
+            return MAX_VALUE;
         }
 
         int x = 0;
-        int min = MAX_VALUE;
+        int currMin = MAX_VALUE;
         List<Integer> b = machine.schematics().get(i++);
         while (canIncreasePower(power, x, b, machine)) {
+            if (n + x > min) {
+                break;
+            }
+
             int[] increased = increasePower(power, x, b);
-            int res = solvePartTwo2(machine, i, n + x, increased, memo);
-            min = Math.min(res, min);
+            int res = solvePartTwo2(machine, i, n + x, increased, min);
+            currMin = Math.min(res, currMin);
+            min = Math.min(min, currMin);
             x++;
         }
-
-        memo.put(hash, min);
 
         return min;
     }
@@ -213,10 +221,8 @@ public class Day10 extends AdventOfCodePuzzle {
                     case ')', '}', ',' -> {
                         int value = parseInt(token.toString());
                         token.setLength(0);
-                        if (state == State.WIRING_SCHEMATICS)
-                            schematic.add(value);
-                        else if (state == State.POWER)
-                            power.add(value);
+                        if (state == State.POWER) power.add(value);
+                        if (state == State.WIRING_SCHEMATICS) schematic.add(value);
 
                         if (c == ')') {
                             schematics.add(schematic);
