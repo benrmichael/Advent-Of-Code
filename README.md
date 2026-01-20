@@ -28,4 +28,4 @@ These are the years I have particiapted in Advent of Code, with a link to the fo
 | Year | Language | Stars ⭐ |
 |----------|----------|----------|
 | [2024](https://github.com/benrmichael/Advent-Of-Code/tree/main/aoc2024) | Python 🐍 | 40/50 |
-| [2025](https://github.com/benrmichael/Advent-Of-Code/tree/main/aoc2025) | Java ☕ | tbd |
+| [2025](https://github.com/benrmichael/Advent-Of-Code/tree/main/aoc2025) | Java ☕ | 21/24 |
